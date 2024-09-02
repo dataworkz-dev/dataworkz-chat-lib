@@ -25,7 +25,7 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
   });
 
   useEffect(() => { 
-    // const loadPost = async () => { 
+    const loadPost = async () => { 
       const historyUrl = baseUrl + systemId + '/questionshistory';
       const historyQuestionsRes = fetch(historyUrl, {
         method: 'GET',
@@ -58,10 +58,10 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
             });
           }
       }
-      // }; 
+      }; 
 
-      // loadPost(); 
-  }); 
+      loadPost(); 
+  }, []); 
 
 
   const chatWithUs = async (userInput) => {
