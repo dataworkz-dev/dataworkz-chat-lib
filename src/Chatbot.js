@@ -3,7 +3,7 @@ import './Chatbot.css';
 import TypewriterEffect from './TypewriterEffect';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileLines, faMagnifyingGlass, faPaperPlane, faRetweet, faRobot } from '@fortawesome/free-solid-svg-icons';
-const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpriseSearchToken}) => {
+const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpriseSearchToken, enterpriseBaseUrl}) => {
   const [input, setInput] = useState('');
   const [inputEnterprise, setInputEnterprise] = useState('');
   const [messages, setMessages] = useState([]);
@@ -149,7 +149,7 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
       }
     }, 1000);
 
-    const sementicUrl = baseUrl + enterpriseSearchId + '/search?query=' + inputEnterprise;
+    const sementicUrl = enterpriseBaseUrl + enterpriseSearchId + '/search?query=' + inputEnterprise;
     const sementicRes = await fetch(sementicUrl, {
       method: 'GET',
       headers: {
