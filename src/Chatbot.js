@@ -25,9 +25,9 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
   });
 
   useEffect(() => { 
-    const loadPost = async () => { 
+    // const loadPost = async () => { 
       const historyUrl = baseUrl + systemId + '/questionshistory';
-      const historyQuestionsRes = await fetch(historyUrl, {
+      const historyQuestionsRes = fetch(historyUrl, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -58,9 +58,9 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
             });
           }
       }
-      }; 
+      // }; 
 
-      loadPost(); 
+      // loadPost(); 
   }); 
 
 
@@ -186,7 +186,7 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
   }
   
   return (
-    <div>
+    <div style={{width: 'fit-content'}}>
       { openChat === true || openEnterpriseChat === true? <div className="blurDiv"></div>: ''}
     <div className='chatbot-wrapper-div'>
       {openEnterpriseChat === false ? <div className='chatbot-chat-div' onClick={handleEnterpriseOpenChat}>Chat with us. </div> : null}
