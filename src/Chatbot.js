@@ -27,7 +27,7 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
   useEffect(() => { 
     const loadPost = async () => { 
       const historyUrl = baseUrl + systemId + '/questionshistory';
-      const historyQuestionsRes = fetch(historyUrl, {
+      const historyQuestionsRes = await fetch(historyUrl, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -160,6 +160,27 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
     clearInterval(textTimeout)
     setShowLoaderEnterprise(false)
     if(sementicRes && sementicRes.searchResultsList && sementicRes.searchResultsList.length) {
+      sementicRes.searchResultsList.map((res)=> {
+        if(res && res.additionalInfo && res.additionalInfo.hits && res.additionalInfo.hits.length) {
+          res['hitText'] = '';
+          res.additionalInfo.hits.map((hit)=> {
+            let a = hit.replace(/<em>/g, '<b>');
+            let b = a.replace(/<\/em>/g, '</b>')
+            res['hitText'] += b + ' ... ';
+          })
+        }
+        if(res && res.metadata && Object.keys(res.metadata) && Object.keys(res.metadata).length) {
+          let metaDataArray = [];
+          Object.keys(res.metadata).map((meta, i) => {
+            let obj = {
+              field: meta,
+              value: res.metadata[meta]
+            }
+            metaDataArray.push(obj);
+          })
+          res['metaDataArray'] = metaDataArray
+        }
+      })
       setEnterpriseResponseList(sementicRes.searchResultsList);
     }
 
@@ -216,7 +237,23 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
         {enterpriseResponseList && enterpriseResponseList.length ? <div className='enterprise-body'>
            {enterpriseResponseList.map((list, index) => (<div className={`${index > 0 ? 'enterprise-data-div' : ''}`}><div><span>
             <FontAwesomeIcon icon={faFileLines} />
-            </span><a href={list.link} target='_blank' rel="noreferrer" className='text-decoration-none'> <span className='link-span'>{list.link.split('/')[list.link.split('/').length - 1]}</span></a></div><div className='margin-top-20'>{list.data}</div></div>))}
+            </span><a href={list.link} target='_blank' rel="noreferrer" className='text-decoration-none'> <span className='link-span'>
+              {list.link.split('/')[list.link.split('/').length - 1]}
+              </span></a></div>
+              {list && list.metaDataArray && list.metaDataArray.length ? <div className='meta-div'>
+                {list.metaDataArray.map((meta, i) => (
+                  <span className='meta-span'> <span>{meta.field}</span> :  
+                  {meta.value && meta.value.length && meta.value.length > 24 ?  <span title={meta.value}>
+                  {meta.value.substring(0, 25) + '...'}</span> :  <span> {meta.value ? <span title={meta.value}>
+                  {meta.value}</span> : <span> Null</span>}</span>}
+                   </span>
+                  ))}
+              </div> : ''}
+              <div className='margin-top-20' style={{marginLeft: '10px'}}>
+                {list && list.hitText && list.hitText.length? 
+                <div dangerouslySetInnerHTML={{ __html: list.hitText }}></div>
+                 : <div>{list.data}</div>}  {}
+              </div></div>))}
            </div> : ''}
       </div> </div> : ''}
       

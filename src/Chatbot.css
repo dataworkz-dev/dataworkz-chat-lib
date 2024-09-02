@@ -362,11 +362,33 @@
   }
 
   .example-question-div {
+    margin-left: 3vw;
     padding: 12px;
     color: #889096;
     font-size: 12PX;
     font-weight: 600;
     letter-spacing: 1px;
     padding-left: 0;
-    margin-left: 3vw;
+  }
+
+  .meta-span {
+    background: #F6F6F6;
+    border: 1px solid #C9C9C9;
+    margin: -1px;
+    border-radius: 6px;
+    font-size: 14px;
+    display: flex;
+    /* max-width: 200px; */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* white-space: nowrap; */
+    margin-top: 10px;
+    margin-left: 10px;
+    padding: 2px 10px;
+  }
+
+  .meta-div {
+    margin-top: 10px;
+    flex-wrap: wrap;
+    display: flex;
   }
