@@ -259,7 +259,7 @@
     border: none;
     outline: none;
     padding: 20px;
-    width: 80%;
+    width: 75%;
     height: 30px;
     font-size: 14px;
   }
@@ -391,4 +391,22 @@
     margin-top: 10px;
     flex-wrap: wrap;
     display: flex;
+  }
+
+  .metalist-div {
+    min-height: 40px;
+    border-bottom: 1px solid;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+
+  .metalist-span {
+    padding: 5px 10px;
+    color: #0003F1;
+    border: 1px solid #eceef0;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block;
+    background: #f7f6fc;
+    margin: 5px;
   }

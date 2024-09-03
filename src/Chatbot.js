@@ -3,7 +3,7 @@ import './Chatbot.css';
 import TypewriterEffect from './TypewriterEffect';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileLines, faMagnifyingGlass, faPaperPlane, faRetweet, faRobot } from '@fortawesome/free-solid-svg-icons';
-const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpriseSearchToken, enterpriseBaseUrl}) => {
+const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpriseSearchToken, enterpriseBaseUrl, enterpriseMetaDataField}) => {
   const [input, setInput] = useState('');
   const [inputEnterprise, setInputEnterprise] = useState('');
   const [messages, setMessages] = useState([]);
@@ -16,7 +16,9 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
   const [showLoadingText, setShowLoadingText] = useState('text1');
   const [showLoaderEnterprise, setShowLoaderEnterprise] = useState(false);
   const [enterpriseResponseList, setEnterpriseResponseList] = useState([]);
+  const [completeEnterpriseResponseList, setCompleteEnterpriseResponseList] = useState([]);
   const [sampleQuestionList, setSampleQuestionList] = useState([]);
+  const [metaDataTypeList, setMetaDataTypeList] = useState([]);
   useEffect(() => {
     document.addEventListener("mousedown", handleOutsideClick);
     return () => {
@@ -138,6 +140,9 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
     e.preventDefault();
     if (!inputEnterprise.trim()) return;
     setEnterpriseResponseList([])
+    setCompleteEnterpriseResponseList([]);
+    setMetaDataTypeList([]);
+    let metadataList = [];
     setShowLoaderEnterprise(true);
     setShowLoadingText('Comprehending the question')
     const textTimeout = setInterval(() => {
@@ -160,10 +165,10 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
     clearInterval(textTimeout)
     setShowLoaderEnterprise(false)
     if(sementicRes && sementicRes.searchResultsList && sementicRes.searchResultsList.length) {
-      sementicRes.searchResultsList.map((res)=> {
+      sementicRes.searchResultsList.forEach((res)=> {
         if(res && res.additionalInfo && res.additionalInfo.hits && res.additionalInfo.hits.length) {
           res['hitText'] = '';
-          res.additionalInfo.hits.map((hit)=> {
+          res.additionalInfo.hits.forEach((hit)=> {
             let a = hit.replace(/<em>/g, '<b>');
             let b = a.replace(/<\/em>/g, '</b>')
             res['hitText'] += b + ' ... ';
@@ -171,17 +176,29 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
         }
         if(res && res.metadata && Object.keys(res.metadata) && Object.keys(res.metadata).length) {
           let metaDataArray = [];
-          Object.keys(res.metadata).map((meta, i) => {
+          Object.keys(res.metadata).forEach((meta, i) => {
             let obj = {
               field: meta,
               value: res.metadata[meta]
             }
             metaDataArray.push(obj);
+            if(meta === enterpriseMetaDataField && res.metadata[meta]) {
+              metadataList.push(res.metadata[meta]);
+            }
+
           })
           res['metaDataArray'] = metaDataArray
         }
       })
+      const set = [...new Set(metadataList)];
+      const result = set.map(value => ({
+        value: value,
+        count: metadataList.filter(item => item === value).length
+      }));
+
+      setMetaDataTypeList(result);
       setEnterpriseResponseList(sementicRes.searchResultsList);
+      setCompleteEnterpriseResponseList(sementicRes.searchResultsList);
     }
 
   }
@@ -204,6 +221,26 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
     const response1 = await chatWithUs(question);
     const newAiMessage = { text: response1.answer, user: false, sources: response1.context };
     setMessages((prevMessages) => [...prevMessages, newAiMessage]);
+  }
+
+  const filterResult = (meta) => {
+    let filteredArray = [];
+    if(meta && meta === 'All') {
+      setEnterpriseResponseList(completeEnterpriseResponseList);
+    } else {
+      filteredArray = completeEnterpriseResponseList.filter((field) => {
+        return field.metadata[enterpriseMetaDataField] === meta.value
+      })
+      if(filteredArray && filteredArray.length) {
+        setEnterpriseResponseList(filteredArray)
+      } else {
+        setEnterpriseResponseList(completeEnterpriseResponseList)
+      }
+    }
+  }
+
+  const clearEnterpriseChat = () => {
+    setEnterpriseResponseList([]);
   }
   
   return (
@@ -230,11 +267,17 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
                   Ask AI
                 </span>
               </div>
+              <div style={{marginLeft: '5px'}} className='switch-div' onClick={clearEnterpriseChat}>
+                Clear
+              </div>
             </div>
           </form>
         </div>  
         {showLoaderEnterprise ? <div className='enterprise-body'> <span><div className="spinner"></div></span> <span className='loader-span' id="showLoadingTextEnterprise">{showLoadingText}</span>  </div>: ''}
         {enterpriseResponseList && enterpriseResponseList.length ? <div className='enterprise-body'>
+          {metaDataTypeList && metaDataTypeList.length ? <div className='metalist-div'><span className='metalist-span' onClick={() => filterResult('All')}><span>All</span><span>({completeEnterpriseResponseList.length})</span></span> {metaDataTypeList.map((metaType, i) => (<span className='metalist-span' onClick={() => filterResult(metaType)}>
+            <span>{metaType.value}</span> <span>({metaType.count})</span>
+          </span>))} </div> : '' }
            {enterpriseResponseList.map((list, index) => (<div className={`${index > 0 ? 'enterprise-data-div' : ''}`}><div><span>
             <FontAwesomeIcon icon={faFileLines} />
             </span><a href={list.link} target='_blank' rel="noreferrer" className='text-decoration-none'> <span className='link-span'>
