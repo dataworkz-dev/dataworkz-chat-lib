@@ -1,6 +1,6 @@
 {
     "name": "dataworkz-chat-app",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "A React library with multiple components and SVG support",
     "main": "dist/index.js",
     "scripts": {
