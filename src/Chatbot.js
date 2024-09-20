@@ -247,7 +247,7 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
     <div style={{width: 'fit-content'}}>
       { openChat === true || openEnterpriseChat === true? <div className="blurDiv"></div>: ''}
     <div className='chatbot-wrapper-div'>
-      {openEnterpriseChat === false ? <div className='chatbot-chat-div' onClick={handleEnterpriseOpenChat}>Chat with us. </div> : null}
+      {openEnterpriseChat === false ? <div className='chatbot-chat-div' onClick={handleOpenChat}>Chat with us. </div> : null}
       {openEnterpriseChat === true ? <div ref={enterpriseRef} className="chatbot-container">
       <div className='inside-chatbot-container'> 
         <div>
