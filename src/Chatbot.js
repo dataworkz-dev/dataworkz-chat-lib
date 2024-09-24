@@ -106,7 +106,10 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
     setInput('');
     setShowLoader(true);
     const response1 = await chatWithUs(input);
-    const newAiMessage = { text: response1.answer, user: false, sources: response1.context };
+    let newAiMessage = { text: response1.answer, user: false, sources: response1.context };
+    if(response1 && response1.status && response1.status === 'FAILED') {
+      newAiMessage = { text: 'FAILED', user: false, sources: [] };
+    }
     setMessages((prevMessages) => [...prevMessages, newAiMessage]);
     setInput('');
   };
@@ -219,7 +222,10 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
     setMessages((prevMessages) => [...prevMessages, userMessage]);
     setShowLoader(true);
     const response1 = await chatWithUs(question);
-    const newAiMessage = { text: response1.answer, user: false, sources: response1.context };
+    let newAiMessage = { text: response1.answer, user: false, sources: response1.context };
+    if(response1 && response1.status && response1.status === 'FAILED') {
+      newAiMessage = { text: 'FAILED', user: false, sources: [] };
+    }
     setMessages((prevMessages) => [...prevMessages, newAiMessage]);
   }
 
@@ -335,14 +341,14 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
             >
               {message.user ? <p className='ai-message-para'> {message.text} </p>: index < messages.length-1 ?<div> <div className='bot-div'>
                 <FontAwesomeIcon icon={faRobot} style={{ color: '#724ae8', width: '25px', height: '25px' }}/>
-                 </div> <div className='ai-message'>{message.text}</div>  </div>: ''}
-              {(index < messages.length -1) && !message.user ? <div className='sources-div'> <div className='source-header'>Sources</div> {message.sources.map((source, i) => (<div className='source-ind-div'><div className='display-inline-block'>
+                 </div> <div className='ai-message'>{message.text === 'FAILED' ? <span style={{color: 'red'}}>Sorry, I couldn't answer you at this point in time.</span> : <span>{message.text}</span>}</div>  </div>: ''}
+              {(index < messages.length -1) && !message.user ? <div className='sources-div'> <div className='source-header'>{message.sources && message.sources.length ? <span>Sources</span>: <span></span> }</div> {message.sources.map((source, i) => (<div className='source-ind-div'><div className='display-inline-block'>
                  <FontAwesomeIcon icon={faFileLines} />
                 </div> <div className='display-inline-block'><a href={source.link} target='_blank' rel="noreferrer" className='text-decoration-none'><span className='link-span'>{source.link.split('/')[source.link.split('/').length - 1]} </span></a></div> <div className='margin-top-20' title={source.data}> {source.data.substring(0, 100) + '...'}</div></div>))} </div>: ''}
               {(index === messages.length - 1 && showTyping) && !message.user && message.text.length ? <TypewriterEffect key={index} text={message.text} sources={message.sources} speed={10} />: 
               !message.user && index === messages.length - 1 ? <div> <div> <div className='bot-div'>
                 <FontAwesomeIcon icon={faRobot} style={{ color: '#724ae8', width: '25px', height: '25px' }}/>
-                </div> <div className='ai-message'>{message.text}</div>  </div> <div className='sources-div'> <div className='source-header'>Sources</div> {message.sources.map((source, i) => (<div className='source-ind-div'><div className='display-inline-block'>
+                </div> <div className='ai-message'>{message.text === 'FAILED' ? <span style={{color: 'red'}}>Sorry, I couldn't answer you at this point in time.</span> : <span>{message.text}</span>}</div>  </div> <div className='sources-div'> <div className='source-header'>{message.sources && message.sources.length ? <span>Sources</span>: <span></span> }</div> {message.sources.map((source, i) => (<div className='source-ind-div'><div className='display-inline-block'>
                    <FontAwesomeIcon icon={faFileLines} />
                     </div> <div className='display-inline-block'><a href={source.link} target='_blank' rel="noreferrer" className='text-decoration-none'><span className='link-span'>{source.link.split('/')[source.link.split('/').length - 1]} </span></a></div> <div className='margin-top-20' title={source.data}> {source.data.substring(0, 100) + '...'} </div> </div>))} </div>  </div>:''}
             </div>

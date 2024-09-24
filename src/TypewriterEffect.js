@@ -10,7 +10,11 @@ const TypewriterEffect = ({ text, speed = 1, sources = [] }) => {
   const myRef = useRef(null)
   const sourceRef = useRef(null)
   useEffect(() => {
-    if (index < text.length) {
+    if(text == 'FAILED') {
+      setDisplayedText("Sorry, I couldn't answer you at this point in time.");
+      myRef.current.scrollIntoView() 
+      sourceRef.current.scrollIntoView() 
+    } else if (index < text.length) {
       const timer = setTimeout(() => {
         setDisplayedText(displayedText + text[index]);
         setIndex(index + 1);
@@ -33,12 +37,12 @@ const TypewriterEffect = ({ text, speed = 1, sources = [] }) => {
     <div className='bot-div'>
       <FontAwesomeIcon icon={faRobot} style={{ color: '#724ae8', width: '25px', height: '25px' }}/>
     </div>
-    <div className='ai-message'> {displayedText}</div>
+    <div className='ai-message'> { text == 'FAILED' ? <span style={{color: 'red'}}>Sorry, I couldn't answer you at this point in time.</span> : <span>{displayedText}</span> }</div>
     </div>
     
     {<div className='sources-div'>
       
-      {showSources ? <div><div className='source-header'>Sources:</div>
+      {showSources ? <div><div className='source-header'>{sources && sources.length ? 'Sources' : ''}</div>
       {sources.map((source, i) => (
         <div>
           <div key={i} className='source-ind-div'>
