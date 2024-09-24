@@ -88,13 +88,8 @@ const Chatbot = ({systemId, llmId, token, baseUrl, enterpriseSearchId, enterpris
       },
     }).then(systems => systems.json());
     clearInterval(textTimeout);
-    if(systems && systems.answer && systems.answer.length) {
-      setShowLoader(false)
-      return systems
-    } else {
-      setShowLoader(false)
-      return ' '
-    }
+    setShowLoader(false)
+    return systems
   };
 
   const handleSubmit = async (e) => {
